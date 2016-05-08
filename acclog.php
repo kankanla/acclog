@@ -3,7 +3,8 @@
 error_reporting(E_ALL);
 date_default_timezone_set('Asia/Tokyo');
 set_time_limit(120);
-
+session_name('aixin');
+session_start();
 
 //利用方法
 //log
@@ -54,7 +55,7 @@ class acclog{
 			$this->create_acclog_db();
 		}
 		
-		if(filesize($this->db_name) > 6438912){
+		if(filesize($this->db_name) > 8388608){
 			$this->diet();			
 		}
 		
@@ -105,12 +106,14 @@ class acclog{
 		echo '<div>__FEIL__::'.__FILE__.'<div>';
 		echo '<br>';
 		
-		$vt = $db->prepare("select * from page_count");
+		$vt = $db->prepare("select * from page_count order by script_filename asc");
 		$vx = $vt->execute();
 		
 		echo '<table border=1>';
 			while($vxx = $vx->fetchArray(SQLITE3_ASSOC)){
-				echo "<tr><td>{$vxx['script_filename']}</td><td>{$vxx['count']}</td></tr>";
+				if(file_exists($vxx['script_filename'])){
+					echo "<tr><td>{$vxx['script_filename']}</td><td>{$vxx['count']}</td></tr>";
+				}
 			}
 		echo '</table>';
 		$db->close();		
